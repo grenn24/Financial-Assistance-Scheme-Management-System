@@ -1,0 +1,14 @@
+{
+	"name": "financial-assistance-schema-management-system",
+	"version": "1.0.0",
+	"description": "manage financial assistance schemes and applications for schemes",
+	"license": "ISC",
+	"author": "",
+	"type": "commonjs",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "go run main.go",
+		"build": "set GIN_MODE=release&&go build main.go"
+	}
+}
