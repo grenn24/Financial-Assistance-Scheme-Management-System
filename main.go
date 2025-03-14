@@ -26,6 +26,6 @@ func main() {
 	startup.Routes(router, db)
 
 	// Start the backend server
-	fmt.Printf("Server is running on %v%v:%v\n", os.Getenv("PROTOCOL"),os.Getenv("DOMAIN_NAME"), os.Getenv("PORT"))
+	fmt.Printf("Server is running on http://localhost:%v\n", os.Getenv("PORT"))
 	router.Run(":" + os.Getenv("PORT"))
 }

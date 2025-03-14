@@ -1,7 +1,7 @@
 package services
 
 import (
-	models "github.com/grenn24/financial-assistance-scheme-management-system/models/Scheme"
+	 "github.com/grenn24/financial-assistance-scheme-management-system/models"
 	"gorm.io/gorm"
 )
 
@@ -9,9 +9,9 @@ type SchemeService struct {
 	Db *gorm.DB
 }
 
-func (this *SchemeService) GetAllSchemes() ([]models.Scheme, error) {
+func (schemeService *SchemeService) GetAllSchemes() ([]models.Scheme, error) {
 	var schemes []models.Scheme
-	result := this.Db.Find(&schemes)
+	result := schemeService.Db.Find(&schemes)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -19,9 +19,9 @@ func (this *SchemeService) GetAllSchemes() ([]models.Scheme, error) {
 	return schemes, nil
 }
 
-func (this *SchemeService) GetSchemeByID(id string) (*models.Scheme, error) {
+func (schemeService *SchemeService) GetSchemeByID(id string) (*models.Scheme, error) {
 	var scheme models.Scheme
-	result := this.Db.First(&scheme, id)
+	result := schemeService.Db.First(&scheme, id)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -29,13 +29,24 @@ func (this *SchemeService) GetSchemeByID(id string) (*models.Scheme, error) {
 	return &scheme, nil
 }
 
-func (this *SchemeService) DeleteSchemeByID(id string) (*models.Scheme, error) {
+func (schemeService *SchemeService) CreateScheme(scheme *models.Scheme) (*models.Scheme, error) {
 
-	scheme, err := this.GetSchemeByID(id)
+	result := schemeService.Db.Create(&scheme)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return scheme, nil
+}
+
+func (schemeService *SchemeService) DeleteSchemeByID(id string) (*models.Scheme, error) {
+
+	scheme, err := schemeService.GetSchemeByID(id)
 	if err != nil {
 		return nil, err
 	}
-	result := this.Db.Delete(&models.Scheme{}, id)
+	result := schemeService.Db.Delete(&models.Scheme{}, id)
 
 	if result.Error != nil {
 		return nil, result.Error

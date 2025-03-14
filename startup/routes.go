@@ -23,10 +23,9 @@ func Routes(router *gin.Engine, db *gorm.DB) {
 
 	// Missed Routes
 	router.NoRoute(func(context *gin.Context) {
-		context.JSON(http.StatusNoContent, gin.H{
-			"Status":    "error",
-			"ErrorCode": "INVALID_API_ROUTE",
-			"Message":   "This route does not exist on the api",
+		context.JSON(http.StatusNotFound, gin.H{
+			"Status":  "INVALID_API_ROUTE",
+			"Message": "This route does not exist on the api",
 		})
 	})
 }

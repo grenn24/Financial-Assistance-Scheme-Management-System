@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/grenn24/financial-assistance-scheme-management-system/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -19,14 +20,41 @@ func Db() *gorm.DB {
 		os.Getenv("DB_port"),
 		os.Getenv("DB_name"))
 
-	//Reference the db pointer to sql.DB instance
+	//Reference the db pointer to gorm.DB instance
 	db, err := gorm.Open(postgres.Open(conn), &gorm.Config{})
 
-
-	//check for connection string verification error
+	// Check for connection error
 	if err != nil {
-		log.Fatal("Error connecting to the database: ", err.Error())
+		log.Fatal("Error connecting to database: ", err.Error())
 	}
 	fmt.Println("Database connection successful!")
+
+	// Create enum types
+	db.Exec(`
+		DO $$ 
+		BEGIN 
+			IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'marital_status') THEN
+				CREATE TYPE marital_status AS ENUM ('single', 'married', 'widowed', 'divorced');
+			END IF;
+			IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'sex') THEN
+				CREATE TYPE sex AS ENUM ('male', 'female');
+			END IF;
+			IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'relation') THEN
+				CREATE TYPE relation AS ENUM ('husband', 'wife', 'son', 'daughter');
+			END IF;
+			IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'status') THEN
+				CREATE TYPE status AS ENUM ('pending', 'approved', 'rejected');
+			END IF;
+		END $$;
+
+		CREATE EXTENSION IF NOT EXISTS pgcrypto;
+	`)
+
+	// Create tables if they do not exist
+	err = db.AutoMigrate(&models.Scheme{}, &models.Applicant{}, &models.Application{}, &models.SchemeBenefit{}, &models.SchemeCriteria{})
+	if err != nil {
+		log.Fatal("Error migrating database schema: ", err.Error())
+	}
+
 	return db
 }
