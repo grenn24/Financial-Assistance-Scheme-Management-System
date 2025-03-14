@@ -4,7 +4,7 @@
 Hoo Di Heng  
 
 **Back-End:**  
-GoLang, Gin, GORM
+GoLang, Gin, GORM, validator, uuid
 
 ### API Endpoints 
 **Applications**  
