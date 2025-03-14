@@ -13,14 +13,18 @@ func ApplicantionRoutes(router *gin.RouterGroup, db *gorm.DB) {
 	applicationController := &controllers.ApplicationController{Db: db, ApplicationService: &services.ApplicationService{Db: db}}
 
 	applicationRouter.GET("/", func(context *gin.Context) {
-		applicationController.GetAllApplications(context, db)
+		applicationController.GetAllApplications(context)
 	})
 
 	applicationRouter.POST("/", func(context *gin.Context) {
-		applicationController.CreateApplication(context, db)
+		applicationController.CreateApplication(context)
 	})
 
 	applicationRouter.DELETE("/:ID", func(context *gin.Context) {
-		applicationController.DeleteApplicationByID(context, db)
+		applicationController.DeleteApplicationByID(context)
+	})
+
+	applicationRouter.DELETE("/", func(context *gin.Context) {
+		applicationController.DeleteAllApplications(context)
 	})
 }

@@ -14,6 +14,9 @@ type Application struct {
 	Status      Status    `gorm:"type:status ; not null" json:"status"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	// Preloadable Columns
+	Applicant *Applicant `gorm:"foreignKey:ApplicantID ; references:ID"`
+	Scheme    *Scheme    `gorm:"foreignKey:SchemeID ; references:ID"`
 }
 
 type Status string

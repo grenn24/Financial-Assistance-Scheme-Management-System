@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 	"github.com/grenn24/financial-assistance-scheme-management-system/models"
 	"github.com/grenn24/financial-assistance-scheme-management-system/services"
 	"gorm.io/gorm"
@@ -15,7 +16,7 @@ type ApplicationController struct {
 	ApplicationService *services.ApplicationService
 }
 
-func (applicationController *ApplicationController) GetAllApplications(context *gin.Context, db *gorm.DB) {
+func (applicationController *ApplicationController) GetAllApplications(context *gin.Context) {
 	applications, err := applicationController.ApplicationService.GetAllApplications()
 	if err != nil {
 		context.JSON(500, gin.H{"error": err.Error()})
@@ -24,9 +25,15 @@ func (applicationController *ApplicationController) GetAllApplications(context *
 	context.JSON(200, applications)
 }
 
-func (applicationController *ApplicationController) GetApplicationByID(context *gin.Context, db *gorm.DB) {
-	ID := context.Param("ID")
-	application, err := applicationController.ApplicationService.GetApplicationByID(ID)
+func (applicationController *ApplicationController) GetApplicationByID(context *gin.Context) {
+	id := context.Param("ID")
+	// Validate id
+	err := uuid.Validate(id)
+	if err != nil {
+		context.JSON(404, gin.H{"error": "INVALID_ID_FORMAT"})
+		return
+	}
+	application, err := applicationController.ApplicationService.GetApplicationByID(id)
 	if err != nil {
 		context.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -34,7 +41,7 @@ func (applicationController *ApplicationController) GetApplicationByID(context *
 	context.JSON(200, application)
 }
 
-func (applicationController *ApplicationController) CreateApplication(context *gin.Context, db *gorm.DB) {
+func (applicationController *ApplicationController) CreateApplication(context *gin.Context) {
 	application := new(models.Application)
 
 	// Bind http request body into struct
@@ -68,9 +75,15 @@ func (applicationController *ApplicationController) CreateApplication(context *g
 
 }
 
-func (applicationController *ApplicationController) DeleteApplicationByID(context *gin.Context, db *gorm.DB) {
-	ID := context.Param("ID")
-	application, err := applicationController.ApplicationService.GetApplicationByID(ID)
+func (applicationController *ApplicationController) DeleteApplicationByID(context *gin.Context) {
+	id := context.Param("ID")
+	// Validate id
+	err := uuid.Validate(id)
+	if err != nil {
+		context.JSON(404, gin.H{"error": "INVALID_ID_FORMAT"})
+		return
+	}
+	application, err := applicationController.ApplicationService.GetApplicationByID(id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			context.JSON(404, gin.H{"error": "Application not found"})
@@ -80,4 +93,15 @@ func (applicationController *ApplicationController) DeleteApplicationByID(contex
 		return
 	}
 	context.JSON(200, application)
+}
+
+func (applicationController *ApplicationController) DeleteAllApplications(context *gin.Context) {
+	applicationsDeleted, err := applicationController.ApplicationService.DeleteAllApplications()
+	if err != nil {
+		context.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	context.JSON(200, gin.H{
+		"applicationsDeleted": applicationsDeleted,
+	})
 }

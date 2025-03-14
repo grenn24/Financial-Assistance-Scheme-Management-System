@@ -21,7 +21,7 @@ func (applicationSer *ApplicationService) GetAllApplications() ([]models.Applica
 
 func (applicationService *ApplicationService) GetApplicationByID(id string) (*models.Application, error) {
 	var applications models.Application
-	result := applicationService.Db.First(&applications, id)
+	result := applicationService.Db.First(&applications,  "id = ?", id)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -40,16 +40,28 @@ func (applicationService *ApplicationService) CreateApplication(application *mod
 	return application, nil
 }
 
-func (applicationSer *ApplicationService) DeleteApplicationByID(id string) (*models.Application, error) {
+func (applicationService *ApplicationService) DeleteApplicationByID(id string) (*models.Application, error) {
 
-	scheme, err := applicationSer.GetApplicationByID(id)
+	scheme, err := applicationService.GetApplicationByID(id)
 	if err != nil {
 		return nil, err
 	}
-	result := applicationSer.Db.Delete(&models.Application{}, id)
+	result := applicationService.Db.Delete(&models.Application{},  "id = ?", id)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	return scheme, nil
 }
+
+
+func (applicationService *ApplicationService) DeleteAllApplications() (int, error) {
+
+	result := applicationService.Db.Where("true").Delete(&models.Application{})
+
+	if result.Error != nil {
+		return 0, result.Error
+	}
+	return int(result.RowsAffected), nil
+}
+

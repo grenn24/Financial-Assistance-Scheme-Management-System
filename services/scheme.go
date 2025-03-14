@@ -21,7 +21,7 @@ func (schemeService *SchemeService) GetAllSchemes() ([]models.Scheme, error) {
 
 func (schemeService *SchemeService) GetSchemeByID(id string) (*models.Scheme, error) {
 	var scheme models.Scheme
-	result := schemeService.Db.First(&scheme, id)
+	result := schemeService.Db.First(&scheme,  "id = ?", id)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -46,10 +46,21 @@ func (schemeService *SchemeService) DeleteSchemeByID(id string) (*models.Scheme,
 	if err != nil {
 		return nil, err
 	}
-	result := schemeService.Db.Delete(&models.Scheme{}, id)
+	result := schemeService.Db.Delete(&models.Scheme{},  "id = ?", id)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
 	return scheme, nil
+}
+
+
+func (schemeService *SchemeService) DeleteAllSchemes() (int, error) {
+
+	result := schemeService.Db.Where("true").Delete(&models.Scheme{})
+
+	if result.Error != nil {
+		return 0, result.Error
+	}
+	return int(result.RowsAffected), nil
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 	"github.com/grenn24/financial-assistance-scheme-management-system/models"
 	"github.com/grenn24/financial-assistance-scheme-management-system/services"
 	"gorm.io/gorm"
@@ -25,8 +26,14 @@ func (schemeController *SchemeController) GetAllSchemes(context *gin.Context) {
 }
 
 func (schemeController *SchemeController) GetSchemeByID(context *gin.Context) {
-	ID := context.Param("ID")
-	scheme, err := schemeController.SchemeService.GetSchemeByID(ID)
+	id := context.Param("ID")
+	// Validate id
+	err := uuid.Validate(id)
+	if err != nil {
+		context.JSON(404, gin.H{"error": "INVALID_ID_FORMAT"})
+		return
+	}
+	scheme, err := schemeController.SchemeService.GetSchemeByID(id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			context.JSON(404, gin.H{"error": "Scheme not found"})
@@ -74,8 +81,15 @@ func (schemeController *SchemeController) CreateScheme(context *gin.Context) {
 
 // Delete and return deleted scheme
 func (schemeController *SchemeController) DeleteSchemeByID(context *gin.Context) {
-	ID := context.Param("ID")
-	scheme, err := schemeController.SchemeService.GetSchemeByID(ID)
+	
+	id := context.Param("ID")
+	// Validate id
+	err := uuid.Validate(id)
+	if err != nil {
+		context.JSON(404, gin.H{"error": "INVALID_ID_FORMAT"})
+		return
+	}
+	scheme, err := schemeController.SchemeService.GetSchemeByID(id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			context.JSON(404, gin.H{"error": "Scheme not found"})
@@ -85,4 +99,16 @@ func (schemeController *SchemeController) DeleteSchemeByID(context *gin.Context)
 		return
 	}
 	context.JSON(200, scheme)
+}
+
+func (schemeController *SchemeController) DeleteAllSchemes(context *gin.Context) {
+
+	schemesDeleted, err := schemeController.SchemeService.DeleteAllSchemes()
+	if err != nil {
+		context.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	context.JSON(200, gin.H{
+		"schemesDeleted": schemesDeleted,
+	})
 }

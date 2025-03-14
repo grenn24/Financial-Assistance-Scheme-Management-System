@@ -20,4 +20,4 @@ DELETE  /api/applicants/:ID -> Delete an applicant by id
 **Schemes**
 GET  /api/schemes -> Get all schemes
 POST  /api/schemes -> Create a new schemes
-DELETE  /api/schemes/:ID -> Delete an application by id
+DELETE  /api/schemes/:ID -> Delete a scheme by id

@@ -10,21 +10,25 @@ import (
 func ApplicantRoutes(router *gin.RouterGroup, db *gorm.DB) {
 	applicantRouter := router.Group("/applicants")
 
-	applicantController := &controllers.ApplicantController{Db:db, ApplicantService: &services.ApplicantService{Db:db}}
+	applicantController := &controllers.ApplicantController{Db: db, ApplicantService: &services.ApplicantService{Db: db}}
 
 	applicantRouter.GET("/", func(context *gin.Context) {
-		applicantController.GetAllApplicants(context, db)
+		applicantController.GetAllApplicants(context)
 	})
 
 	applicantRouter.GET("/:ID", func(context *gin.Context) {
-		applicantController.GetApplicantByID(context, db)
+		applicantController.GetApplicantByID(context)
 	})
 
 	applicantRouter.POST("/", func(context *gin.Context) {
-		applicantController.CreateApplicant(context, db)
+		applicantController.CreateApplicant(context)
 	})
 
 	applicantRouter.DELETE("/:ID", func(context *gin.Context) {
-		applicantController.DeleteApplicantByID(context, db)
+		applicantController.DeleteApplicantByID(context)
+	})
+
+	applicantRouter.DELETE("/", func(context *gin.Context) {
+		applicantController.DeleteAllApplicants(context)
 	})
 }
