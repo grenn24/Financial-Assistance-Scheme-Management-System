@@ -1,7 +1,7 @@
 package services
 
 import (
-	"fmt"
+	_ "fmt"
 	_ "fmt"
 
 	_ "github.com/google/uuid"
@@ -25,32 +25,12 @@ func (applicantService *ApplicantService) GetAllApplicants() ([]models.Applicant
 
 func (applicantService *ApplicantService) GetApplicantByID(id string) (*models.Applicant, error) {
 	var applicant models.Applicant
-	var household []models.Applicant
 
 	// Retrieve applicant
-	result := applicantService.Db.Preload("Parent").Preload("Spouse").First(&applicant, "id = ?", id)
+	result := applicantService.Db.Preload("Household").First(&applicant, "id = ?", id)
 	if result.Error != nil {
 		return nil, result.Error
 	}
-
-	// Retrieve household members separately
-	result = applicantService.Db.
-		Select("*, "+`CASE 
-			WHEN parent_id IS NOT NULL AND sex = 'male' THEN 'son'
-			WHEN parent_id IS NOT NULL AND sex != 'male' THEN 'daughter'
-			WHEN spouse_id IS NOT NULL AND sex = 'male' THEN 'husband'
-			WHEN spouse_id IS NOT NULL AND sex != 'male' THEN 'wife'
-			ELSE 'Unknown'
-		END AS relation`,
-		).Where("parent_id = ? OR spouse_id = ?", id, id).
-		Find(&household)
-
-		fmt.Println(household)
-
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	applicant.Household = household
 
 	return &applicant, nil
 }
