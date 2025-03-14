@@ -75,6 +75,37 @@ func (applicationController *ApplicationController) CreateApplication(context *g
 
 }
 
+func (applicationController *ApplicationController) UpdateApplication(context *gin.Context) {
+	id := context.Param("ID")
+	// Validate id
+	err := uuid.Validate(id)
+	if err != nil {
+		context.JSON(404, gin.H{"error": "INVALID_ID_FORMAT"})
+		return
+	}
+	application := new(models.Application)
+
+	// Bind http request body into struct
+	if err := context.ShouldBind(application); err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"status": "INTERNAL_SERVER_ERROR",
+			"message": err.Error()})
+		return
+	}
+
+	application, err = applicationController.ApplicationService.UpdateApplication(application, id)
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			context.JSON(404, gin.H{"error": "Application not found"})
+			return
+		}
+		context.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	context.JSON(200, application)
+
+}
+
 func (applicationController *ApplicationController) DeleteApplicationByID(context *gin.Context) {
 	id := context.Param("ID")
 	// Validate id

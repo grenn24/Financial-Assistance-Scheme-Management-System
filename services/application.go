@@ -11,7 +11,7 @@ type ApplicationService struct {
 
 func (applicationSer *ApplicationService) GetAllApplications() ([]models.Application, error) {
 	var applications []models.Application
-	result := applicationSer.Db.Find(&applications)
+	result := applicationSer.Db.Preload("Applicant").Preload("Applicant.Household").Preload("Scheme").Preload("Scheme.Benefits").Preload("Scheme.Criteria").Find(&applications)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -21,7 +21,7 @@ func (applicationSer *ApplicationService) GetAllApplications() ([]models.Applica
 
 func (applicationService *ApplicationService) GetApplicationByID(id string) (*models.Application, error) {
 	var applications models.Application
-	result := applicationService.Db.First(&applications,  "id = ?", id)
+	result := applicationService.Db.Preload("Applicant").Preload("Applicant.Household").Preload("Scheme").Preload("Scheme.Benefits").Preload("Scheme.Criteria").First(&applications,  "id = ?", id)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -33,6 +33,15 @@ func (applicationService *ApplicationService) CreateApplication(application *mod
 
 	result := applicationService.Db.Create(&application)
 
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return application, nil
+}
+
+func (applicationService *ApplicationService) UpdateApplication(application *models.Application, id string) (*models.Application, error) {
+	result := applicationService.Db.Model(&models.Application{}).Updates(&application)
 	if result.Error != nil {
 		return nil, result.Error
 	}

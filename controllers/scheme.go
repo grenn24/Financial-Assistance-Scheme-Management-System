@@ -79,9 +79,40 @@ func (schemeController *SchemeController) CreateScheme(context *gin.Context) {
 
 }
 
+func (schemeController *SchemeController) UpdateScheme(context *gin.Context) {
+	id := context.Param("ID")
+	// Validate id
+	err := uuid.Validate(id)
+	if err != nil {
+		context.JSON(404, gin.H{"error": "INVALID_ID_FORMAT"})
+		return
+	}
+	scheme := new(models.Scheme)
+
+	// Bind http request body into struct
+	if err := context.ShouldBind(scheme); err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"status": "INTERNAL_SERVER_ERROR",
+			"message": err.Error()})
+		return
+	}
+
+	scheme, err = schemeController.SchemeService.UpdateScheme(scheme, id)
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			context.JSON(404, gin.H{"error": "Scheme not found"})
+			return
+		}
+		context.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	context.JSON(200, scheme)
+
+}
+
 // Delete and return deleted scheme
 func (schemeController *SchemeController) DeleteSchemeByID(context *gin.Context) {
-	
+
 	id := context.Param("ID")
 	// Validate id
 	err := uuid.Validate(id)

@@ -11,13 +11,12 @@ type Applicant struct {
 	Base
 	Name             string        `gorm:"not null" json:"name" validate:"required"`
 	EmploymentStatus *bool         `gorm:"not null" json:"employment_status" validate:"required"`
-	MaritalStatus    MaritalStatus `gorm:"type:marital_status ; null" json:"marital_status" validate:"oneofci=single married widowed divorced"`
-	Sex              Sex           `gorm:"type:sex ; not null" json:"sex" validate:"oneofci=male female"`
+	MaritalStatus    MaritalStatus `gorm:"type:marital_status ; null" json:"marital_status" validate:"required,oneof=single married widowed divorced"`
+	Sex              Sex           `gorm:"type:sex ; not null" json:"sex" validate:"required,oneof=male female"`
 	DOB              time.Time     `gorm:"not null" json:"date_of_birth" validate:"required"`
 
 	// Preloadable Columns
-	Household []HouseholdMember `gorm:"foreignKey:HouseholdOwnerID;references:ID" json:"household"`
-
+	Household []HouseholdMember `gorm:"foreignKey:HouseholdOwnerID;references:ID;onDelete:CASCADE" json:"household" validate:"dive"`
 }
 
 type MaritalStatus string

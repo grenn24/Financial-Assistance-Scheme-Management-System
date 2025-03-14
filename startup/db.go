@@ -51,7 +51,7 @@ func Db() *gorm.DB {
 	`)
 
 	// Create tables if they do not exist
-	err = db.AutoMigrate(&models.Scheme{}, &models.Applicant{}, &models.Application{}, &models.SchemeBenefit{}, &models.SchemeCriteria{})
+	err = db.AutoMigrate(&models.Scheme{}, &models.Applicant{}, &models.Application{}, &models.SchemeBenefit{}, &models.SchemeCriteria{}, &models.HouseholdMember{})
 	if err != nil {
 		log.Fatal("Error migrating database schema: ", err.Error())
 	}

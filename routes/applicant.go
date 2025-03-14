@@ -24,6 +24,10 @@ func ApplicantRoutes(router *gin.RouterGroup, db *gorm.DB) {
 		applicantController.CreateApplicant(context)
 	})
 
+	applicantRouter.PUT("/", func(context *gin.Context) {
+		applicantController.UpdateApplicant(context)
+	})
+
 	applicantRouter.DELETE("/:ID", func(context *gin.Context) {
 		applicantController.DeleteApplicantByID(context)
 	})

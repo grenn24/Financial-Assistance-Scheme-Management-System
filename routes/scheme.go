@@ -19,6 +19,10 @@ func SchemeRoutes(router *gin.RouterGroup, db *gorm.DB) {
 		schemeController.CreateScheme(context)
 	})
 
+	schemeRouter.PUT("/", func(context *gin.Context) {
+		schemeController.UpdateScheme(context)
+	})
+
 	schemeRouter.DELETE("/", func(context *gin.Context) {
 		schemeController.DeleteAllSchemes(context)
 	})

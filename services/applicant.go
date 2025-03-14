@@ -2,7 +2,6 @@ package services
 
 import (
 	_ "fmt"
-	_ "fmt"
 
 	_ "github.com/google/uuid"
 	"github.com/grenn24/financial-assistance-scheme-management-system/models"
@@ -15,7 +14,7 @@ type ApplicantService struct {
 
 func (applicantService *ApplicantService) GetAllApplicants() ([]models.Applicant, error) {
 	var applicants []models.Applicant
-	result := applicantService.Db.Preload("Parent").Preload("Spouse").Find(&applicants)
+	result := applicantService.Db.Preload("Household").Find(&applicants)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -36,9 +35,32 @@ func (applicantService *ApplicantService) GetApplicantByID(id string) (*models.A
 }
 
 func (applicantService *ApplicantService) CreateApplicant(applicant *models.Applicant) (*models.Applicant, error) {
+	// Start Transaction
+	tx := applicantService.Db.Begin()
+	result := tx.Create(&applicant)
 
-	result := applicantService.Db.Create(&applicant)
+	if result.Error != nil {
+		return nil, result.Error
+	}
 
+	for _, householdMember := range applicant.Household {
+		householdMember.HouseholdOwnerID = applicant.ID
+	}
+
+	result = tx.Create(&applicant.Household)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	// Commit Transaction
+	tx.Commit()
+
+	return applicant, nil
+}
+
+func (applicantService *ApplicantService) UpdateApplicant(applicant *models.Applicant, id string) (*models.Applicant, error) {
+	result := applicantService.Db.Model(&models.Applicant{}).Updates(&applicant)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -69,4 +91,3 @@ func (applicantService *ApplicantService) DeleteAllApplicants() (int, error) {
 	}
 	return int(result.RowsAffected), nil
 }
-
