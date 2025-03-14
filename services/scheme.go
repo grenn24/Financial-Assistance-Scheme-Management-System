@@ -33,16 +33,22 @@ func (schemeService *SchemeService) GetSchemeByID(id string) (*models.Scheme, er
 
 func (schemeService *SchemeService) GetEligibleSchemes(id string) ([]models.Scheme, error) {
 	var applicant models.Applicant
-	result := schemeService.Db.Preload("Household").First( &applicant,"id = ?", id)
+	result := schemeService.Db.First(&applicant, "id = ?", id)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
 	var schemes []models.Scheme
-	result = schemeService.Db.Preload("Benefits").Preload("Criteria").Find(&schemes, "id IN (?)", applicant.Household.Schemes)
+	result = schemeService.Db.Joins("JOIN scheme_criteria AS criteria ON criteria.scheme_id = schemes.id").
+		Where("criteria.employment_status = ? OR criteria.marital_status = ? OR criteria.has_children = ?", applicant.EmploymentStatus, applicant.MaritalStatus).
+		Preload("Benefits").
+		Preload("Criteria").
+		Find(&schemes)
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
+	return schemes, nil
 }
 
 func (schemeService *SchemeService) CreateScheme(scheme *models.Scheme) (*models.Scheme, error) {
