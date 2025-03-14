@@ -20,13 +20,13 @@ func (applicationSer *ApplicationService) GetAllApplications() ([]models.Applica
 }
 
 func (applicationService *ApplicationService) GetApplicationByID(id string) (*models.Application, error) {
-	var applications models.Application
-	result := applicationService.Db.Preload("Applicant").Preload("Applicant.Household").Preload("Scheme").Preload("Scheme.Benefits").Preload("Scheme.Criteria").First(&applications,  "id = ?", id)
+	var application models.Application
+	result := applicationService.Db.Preload("Applicant").Preload("Applicant.Household").Preload("Scheme").Preload("Scheme.Benefits").Preload("Scheme.Criteria").First(&application,  "id = ?", id)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return &applications, nil
+	return &application, nil
 }
 
 func (applicationService *ApplicationService) CreateApplication(application *models.Application) (*models.Application, error) {
@@ -37,16 +37,16 @@ func (applicationService *ApplicationService) CreateApplication(application *mod
 		return nil, result.Error
 	}
 
-	return application, nil
+	return applicationService.GetApplicationByID(application.ID.String())
 }
 
-func (applicationService *ApplicationService) UpdateApplication(application *models.Application, id string) (*models.Application, error) {
-	result := applicationService.Db.Model(&models.Application{}).Updates(&application)
+func (applicationService *ApplicationService) UpdateApplication(application *models.UpdateApplicationRequest, id string) (*models.Application, error) {
+	result := applicationService.Db.Model(&models.Application{}).Where("id = ?", id).Updates(&application)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return application, nil
+	return applicationService.GetApplicationByID(id)
 }
 
 func (applicationService *ApplicationService) DeleteApplicationByID(id string) (*models.Application, error) {

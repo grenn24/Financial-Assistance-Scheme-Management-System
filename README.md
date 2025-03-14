@@ -32,7 +32,7 @@ PUT /api/schemes/{ID} -> Update scheme details
 DELETE /api/schemes/{ID} -> Delete a scheme by id  
 DELETE /api/schemes -> Delete all schemes
 
-**Response JSON Structure**
+**Response JSON Structure (GET)**
 ```json
 // Applicant
 {
@@ -143,27 +143,15 @@ DELETE /api/schemes -> Delete all schemes
         "description": "Financial assistance for retrenched workers",
         "benefits": [
             {
-                "id": "01959558-a7bc-7626-9883-e001b0fae142",
-                "created_at": "2025-03-14T23:49:30.172403+08:00",
-                "updated_at": "2025-03-14T23:49:30.172403+08:00",
-                "SchemeID": "01959558-a7bb-7574-92d5-7ae6f528671b",
                 "name": "Additional SkillsFuture credits",
                 "amount": 500.25
             },
             {
-                "id": "01959558-a7bc-7e0f-8193-23563c34f132",
-                "created_at": "2025-03-14T23:49:30.172403+08:00",
-                "updated_at": "2025-03-14T23:49:30.172403+08:00",
-                "SchemeID": "01959558-a7bb-7574-92d5-7ae6f528671b",
                 "name": "Additional SkillsFuture credits",
                 "amount": 500.25
             }
         ],
         "criteria": {
-            "id": "01959558-a7bc-7e0e-b7ad-5e3e8057da81",
-            "created_at": "2025-03-14T23:49:30.17188+08:00",
-            "updated_at": "2025-03-14T23:49:30.17188+08:00",
-            "SchemeID": "01959558-a7bb-7574-92d5-7ae6f528671b",
             "employment_status": true,
             "marital_status": "single",
             "has_children": {
@@ -175,7 +163,7 @@ DELETE /api/schemes -> Delete all schemes
 }
 ```
 
-**Request JSON Structure**
+**Request JSON Structure (POST)**
 ```json
 // Applicant
 {

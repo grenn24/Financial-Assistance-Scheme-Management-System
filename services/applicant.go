@@ -3,6 +3,7 @@ package services
 import (
 	_ "fmt"
 
+	"github.com/google/uuid"
 	_ "github.com/google/uuid"
 	"github.com/grenn24/financial-assistance-scheme-management-system/models"
 	"gorm.io/gorm"
@@ -46,8 +47,11 @@ func (applicantService *ApplicantService) CreateApplicant(applicant *models.Appl
 	for _, householdMember := range applicant.Household {
 		householdMember.HouseholdOwnerID = applicant.ID
 	}
-
-	result = tx.Create(&applicant.Household)
+	if len(applicant.Household) > 0 {
+		result = tx.Create(&applicant.Household)
+	} else {
+		applicant.Household = []models.HouseholdMember{}
+	}
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -59,13 +63,33 @@ func (applicantService *ApplicantService) CreateApplicant(applicant *models.Appl
 	return applicant, nil
 }
 
-func (applicantService *ApplicantService) UpdateApplicant(applicant *models.Applicant, id string) (*models.Applicant, error) {
-	result := applicantService.Db.Model(&models.Applicant{}).Updates(&applicant)
+func (applicantService *ApplicantService) UpdateApplicant(applicant *models.UpdateApplicantRequest, id string) (*models.Applicant, error) {
+	tx := applicantService.Db.Begin()
+	result := tx.Model(&models.Applicant{}).Where("id = ?", id).Updates(&applicant)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return applicant, nil
+	if len(applicant.Household) > 0 {
+		// Delete existing household members
+		result := applicantService.Db.Where("household_owner_id = ?", id).Delete(&models.HouseholdMember{})
+		if result.Error != nil {
+			return nil, result.Error
+		}
+		for index, householdMember := range applicant.Household {
+			householdMember.HouseholdOwnerID = uuid.MustParse(id)
+			applicant.Household[index] = householdMember
+		}
+		result = tx.Create(&applicant.Household)
+		if result.Error != nil {
+			return nil, result.Error
+		}
+
+	}
+
+	tx.Commit()
+
+	return applicantService.GetApplicantByID(id)
 }
 
 func (applicantService *ApplicantService) DeleteApplicantByID(id string) (*models.Applicant, error) {

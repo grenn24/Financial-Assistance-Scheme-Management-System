@@ -40,7 +40,7 @@ func Db() *gorm.DB {
 				CREATE TYPE sex AS ENUM ('male', 'female');
 			END IF;
 			IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'relation') THEN
-				CREATE TYPE relation AS ENUM ('husband', 'wife', 'son', 'daughter');
+				CREATE TYPE relation AS ENUM ('husband', 'wife', 'son', 'daughter', 'brother', 'sister');
 			END IF;
 			IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'status') THEN
 				CREATE TYPE status AS ENUM ('pending', 'approved', 'rejected');

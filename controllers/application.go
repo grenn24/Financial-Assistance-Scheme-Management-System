@@ -19,7 +19,7 @@ type ApplicationController struct {
 func (applicationController *ApplicationController) GetAllApplications(context *gin.Context) {
 	applications, err := applicationController.ApplicationService.GetAllApplications()
 	if err != nil {
-		context.JSON(500, gin.H{"error": err.Error()})
+		context.JSON(500, gin.H{"message": err.Error(), "status": "INTERNAL_SERVER_ERROR"})
 		return
 	}
 	context.JSON(200, applications)
@@ -30,12 +30,12 @@ func (applicationController *ApplicationController) GetApplicationByID(context *
 	// Validate id
 	err := uuid.Validate(id)
 	if err != nil {
-		context.JSON(404, gin.H{"error": "INVALID_ID_FORMAT"})
+		context.JSON(404, gin.H{"status": "VALIDATION_ERROR","message": "INVALID_ID_FORMAT"})
 		return
 	}
 	application, err := applicationController.ApplicationService.GetApplicationByID(id)
 	if err != nil {
-		context.JSON(500, gin.H{"error": err.Error()})
+		context.JSON(500, gin.H{"message": err.Error(), "status": "INTERNAL_SERVER_ERROR"})
 		return
 	}
 	context.JSON(200, application)
@@ -78,12 +78,12 @@ func (applicationController *ApplicationController) CreateApplication(context *g
 func (applicationController *ApplicationController) UpdateApplication(context *gin.Context) {
 	id := context.Param("ID")
 	// Validate id
-	err := uuid.Validate(id)
-	if err != nil {
-		context.JSON(404, gin.H{"error": "INVALID_ID_FORMAT"})
+
+	if err := uuid.Validate(id) ; err != nil {
+		context.JSON(404, gin.H{"status": "VALIDATION_ERROR","message": "INVALID_ID_FORMAT"})
 		return
 	}
-	application := new(models.Application)
+	application := new(models.UpdateApplicationRequest)
 
 	// Bind http request body into struct
 	if err := context.ShouldBind(application); err != nil {
@@ -92,17 +92,30 @@ func (applicationController *ApplicationController) UpdateApplication(context *g
 		return
 	}
 
-	application, err = applicationController.ApplicationService.UpdateApplication(application, id)
+	// Validate http request body
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	if err := validate.Struct(application); err != nil {
+		if _, ok := err.(validator.ValidationErrors); ok {
+			context.JSON(http.StatusBadRequest, gin.H{"status": "VALIDATION_ERROR",
+				"message": err.Error()})
+			return
+		}
+		context.JSON(http.StatusInternalServerError, gin.H{"status": "INTERNAL_SERVER_ERROR",
+			"message": err.Error()})
+		return
+	}
+
+	updatedApplication, err := applicationController.ApplicationService.UpdateApplication(application, id)
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			context.JSON(404, gin.H{"error": "Application not found"})
+			context.JSON(404, gin.H{"message": "Application not found"})
 			return
 		}
-		context.JSON(500, gin.H{"error": err.Error()})
+		context.JSON(500, gin.H{"message": err.Error(), "status": "INTERNAL_SERVER_ERROR"})
 		return
 	}
-	context.JSON(200, application)
+	context.JSON(200, updatedApplication)
 
 }
 
@@ -111,16 +124,16 @@ func (applicationController *ApplicationController) DeleteApplicationByID(contex
 	// Validate id
 	err := uuid.Validate(id)
 	if err != nil {
-		context.JSON(404, gin.H{"error": "INVALID_ID_FORMAT"})
+		context.JSON(404, gin.H{"status": "VALIDATION_ERROR","message": "INVALID_ID_FORMAT"})
 		return
 	}
 	application, err := applicationController.ApplicationService.GetApplicationByID(id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			context.JSON(404, gin.H{"error": "Application not found"})
+			context.JSON(404, gin.H{"message": "Application not found"})
 			return
 		}
-		context.JSON(500, gin.H{"error": err.Error()})
+		context.JSON(500, gin.H{"message": err.Error(), "status": "INTERNAL_SERVER_ERROR"})
 		return
 	}
 	context.JSON(200, application)
@@ -129,7 +142,7 @@ func (applicationController *ApplicationController) DeleteApplicationByID(contex
 func (applicationController *ApplicationController) DeleteAllApplications(context *gin.Context) {
 	applicationsDeleted, err := applicationController.ApplicationService.DeleteAllApplications()
 	if err != nil {
-		context.JSON(500, gin.H{"error": err.Error()})
+		context.JSON(500, gin.H{"message": err.Error(), "status": "INTERNAL_SERVER_ERROR"})
 		return
 	}
 	context.JSON(200, gin.H{

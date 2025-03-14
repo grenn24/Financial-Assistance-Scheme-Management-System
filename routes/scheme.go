@@ -15,11 +15,19 @@ func SchemeRoutes(router *gin.RouterGroup, db *gorm.DB) {
 		schemeController.GetAllSchemes(context)
 	})
 
+	schemeRouter.GET("/:ID", func(context *gin.Context) {
+		schemeController.GetSchemeByID(context)
+	})
+
+	schemeRouter.GET("/eligible", func(context *gin.Context) {
+		schemeController.GetEligibleSchemes(context)
+	})
+
 	schemeRouter.POST("/", func(context *gin.Context) {
 		schemeController.CreateScheme(context)
 	})
 
-	schemeRouter.PUT("/", func(context *gin.Context) {
+	schemeRouter.PUT("/:ID", func(context *gin.Context) {
 		schemeController.UpdateScheme(context)
 	})
 

@@ -19,7 +19,7 @@ type ApplicantController struct {
 func (applicantController *ApplicantController) GetAllApplicants(context *gin.Context) {
 	applicants, err := applicantController.ApplicantService.GetAllApplicants()
 	if err != nil {
-		context.JSON(500, gin.H{"error": err.Error()})
+		context.JSON(500, gin.H{"message": err.Error(), "status":"INTERNAL_SERVER_ERROR"})
 		return
 	}
 	context.JSON(200, applicants)
@@ -30,16 +30,16 @@ func (applicantController *ApplicantController) GetApplicantByID(context *gin.Co
 	// Validate id
 	err := uuid.Validate(id)
 	if err != nil {
-		context.JSON(404, gin.H{"error": "INVALID_ID_FORMAT"})
+		context.JSON(404, gin.H{"status": "VALIDATION_ERROR", "message": "INVALID_ID_FORMAT"})
 		return
 	}
 	applicant, err := applicantController.ApplicantService.GetApplicantByID(id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			context.JSON(404, gin.H{"error": "Applicant not found"})
+			context.JSON(404, gin.H{"status":"BAD_REQUEST", "message": "Applicant not found"})
 			return
 		}
-		context.JSON(500, gin.H{"error": err.Error()})
+		context.JSON(500, gin.H{"message": err.Error(), "status":"INTERNAL_SERVER_ERROR"})
 		return
 	}
 	context.JSON(200, applicant)
@@ -81,12 +81,12 @@ func (applicantController *ApplicantController) CreateApplicant(context *gin.Con
 func (applicantController *ApplicantController) UpdateApplicant(context *gin.Context) {
 	id := context.Param("ID")
 	// Validate id
-	err := uuid.Validate(id)
-	if err != nil {
-		context.JSON(404, gin.H{"error": "INVALID_ID_FORMAT"})
+
+	if err := uuid.Validate(id) ; err != nil {
+		context.JSON(404, gin.H{"message": "INVALID_ID_FORMAT"})
 		return
 	}
-	applicant := new(models.Applicant)
+	applicant := new(models.UpdateApplicantRequest)
 
 	// Bind http request body into struct
 	if err := context.ShouldBind(applicant); err != nil {
@@ -95,17 +95,30 @@ func (applicantController *ApplicantController) UpdateApplicant(context *gin.Con
 		return
 	}
 
-	applicant, err = applicantController.ApplicantService.UpdateApplicant(applicant, id)
+	// Validate http request body
+	validate := validator.New()
+	if err := validate.Struct(applicant); err != nil {
+		if _, ok := err.(validator.ValidationErrors); ok {
+			context.JSON(http.StatusBadRequest, gin.H{"status": "VALIDATION_ERROR",
+				"message": err.Error()})
+			return
+		}
+		context.JSON(http.StatusInternalServerError, gin.H{"status": "INTERNAL_SERVER_ERROR",
+			"message": err.Error()})
+		return
+	}
+
+	updatedApplicant, err := applicantController.ApplicantService.UpdateApplicant(applicant, id)
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			context.JSON(404, gin.H{"error": "Applicant not found"})
+			context.JSON(404, gin.H{"status": "VALIDATION_ERROR","message": "Applicant not found"})
 			return
 		}
-		context.JSON(500, gin.H{"error": err.Error()})
+		context.JSON(500, gin.H{"message": err.Error(), "status":"INTERNAL_SERVER_ERROR"})
 		return
 	}
-	context.JSON(200, applicant)
+	context.JSON(200, updatedApplicant)
 }
 
 func (applicantController *ApplicantController) DeleteApplicantByID(context *gin.Context) {
@@ -113,16 +126,16 @@ func (applicantController *ApplicantController) DeleteApplicantByID(context *gin
 	// Validate id
 	err := uuid.Validate(id)
 	if err != nil {
-		context.JSON(404, gin.H{"error": "INVALID_ID_FORMAT"})
+		context.JSON(404, gin.H{"message": "INVALID_ID_FORMAT"})
 		return
 	}
 	applicant, err := applicantController.ApplicantService.DeleteApplicantByID(id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			context.JSON(404, gin.H{"error": "Applicant not found"})
+			context.JSON(404, gin.H{"status": "VALIDATION_ERROR","message": "Applicant not found"})
 			return
 		}
-		context.JSON(500, gin.H{"error": err.Error()})
+		context.JSON(500, gin.H{"message": err.Error(), "status":"INTERNAL_SERVER_ERROR"})
 		return
 	}
 	context.JSON(200, applicant)
@@ -131,7 +144,7 @@ func (applicantController *ApplicantController) DeleteApplicantByID(context *gin
 func (applicantController *ApplicantController) DeleteAllApplicants(context *gin.Context) {
 	applicantsDeleted, err := applicantController.ApplicantService.DeleteAllApplicants()
 	if err != nil {
-		context.JSON(500, gin.H{"error": err.Error()})
+		context.JSON(500, gin.H{"message": err.Error(), "status":"INTERNAL_SERVER_ERROR"})
 		return
 	}
 	context.JSON(200, gin.H{
