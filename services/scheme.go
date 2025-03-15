@@ -41,7 +41,7 @@ func (schemeService *SchemeService) GetEligibleSchemes(id string) ([]models.Sche
 		return nil, result.Error
 	}
 
-	filter := fmt.Sprintf("(criteria.employment_status IS NULL OR criteria.employment_status = '%t') AND (criteria.marital_status IS NULL OR criteria.marital_status = '%s')", *applicant.EmploymentStatus, applicant.MaritalStatus)
+	householdFilter := "criteria.has_children IS NULL"
 
 	// add school level filter conditions
 	var hasPrimary bool
@@ -51,31 +51,30 @@ func (schemeService *SchemeService) GetEligibleSchemes(id string) ([]models.Sche
 	for i := 0; i < len(applicant.Household) && (!hasPrimary || !hasSecondary || !hasTertiary); i++ {
 		if (applicant.Household[i].Relation == "son" || applicant.Household[i].Relation == "daughter") && applicant.Household[i].SchoolLevel != nil {
 			if !hasPrimary && *applicant.Household[i].SchoolLevel == "primary" {
-				filter += fmt.Sprintf(" AND criteria.has_children->>'school_level' = '%s'", "primary")
+				householdFilter += fmt.Sprintf(" OR criteria.has_children->>'school_level' = '%s'", "primary")
 				hasPrimary = true
 			} else if !hasSecondary && *applicant.Household[i].SchoolLevel == "secondary" {
-				filter += fmt.Sprintf(" AND criteria.has_children->>'school_level' = '%s'", "secondary")
+				householdFilter += fmt.Sprintf(" OR criteria.has_children->>'school_level' = '%s'", "secondary")
 				hasSecondary = true
 			} else if !hasTertiary && *applicant.Household[i].SchoolLevel == "tertiary" {
-				filter += fmt.Sprintf(" AND criteria.has_children->>'school_level' = '%s'", "tertiary")
+				householdFilter += fmt.Sprintf(" OR criteria.has_children->>'school_level' = '%s'", "tertiary")
 				hasTertiary = true
 			}
-			// include schemes that allows all school levels
+			// include schemes that allows children from all school levels
 			if !hasChildrenInSchool {
-				filter += fmt.Sprintf("  criteria.has_children->>'school_level' = '%s'", "all")
+				householdFilter += fmt.Sprintf("OR  criteria.has_children->>'school_level' = '%s'", "all")
 				hasChildrenInSchool = true
 			}
 		}
 	}
-	if hasPrimary && hasSecondary && hasTertiary {
-		filter += fmt.Sprintf(" OR criteria.has_children->>'school_level' = '%s'", "all")
-	}
 
-	fmt.Println(filter)
-
+	fmt.Println(householdFilter)
 	var schemes []models.Scheme
 	result = schemeService.Db.Joins("JOIN scheme_criteria AS criteria ON criteria.scheme_id = schemes.id").
-		Where(filter).
+		Where(
+			fmt.Sprintf("(criteria.employment_status IS NULL OR criteria.employment_status = ?) AND (criteria.marital_status IS NULL OR criteria.marital_status = ?) AND (%s)", householdFilter),
+			applicant.EmploymentStatus, applicant.MaritalStatus,
+		).
 		Preload("Benefits").
 		Preload("Criteria").
 		Find(&schemes)
