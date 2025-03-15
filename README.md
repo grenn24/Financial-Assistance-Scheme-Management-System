@@ -73,7 +73,7 @@ npm run start-image
 
 // Option 2 (pull image from dockerhub)
 npm run download-image
-npm run start-image
+docker run -p 3000:3000 grenn24/financial-assistance-schema-management-system:1.0.0
 ```
 
 
