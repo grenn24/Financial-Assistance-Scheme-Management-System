@@ -66,8 +66,8 @@ DELETE /api/schemes -> Delete all schemes
 ```bash
 // Option 1 (build image manually)
 // Install Docker
-
-mv .prod-env .env //Rename .prod-env to .env
+// Rename .prod-env to .env
+mv .prod-env .env
 npm run build-image
 npm run start-image
 
