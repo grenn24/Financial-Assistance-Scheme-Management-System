@@ -39,7 +39,7 @@ DELETE /api/schemes/{ID} -> Delete a scheme by id
 DELETE /api/schemes -> Delete all schemes
 
 **Database Schema**
-###Applicant / Household Member
+### Applicant / Household Member
 Name
 EmploymentStatus
 MaritalStatus
@@ -49,12 +49,12 @@ Relation (household member only)
 SchoolLevel (household member only)
 HouseholdOwnerID (household member only)
 
-###Application
+### Application
 SchemeID (fkey)
 ApplicantID (fkey)
 Status
 
-###Scheme
+### Scheme
 Name
 Description
 Benefits (fkey)
