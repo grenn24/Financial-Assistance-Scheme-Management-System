@@ -64,7 +64,7 @@ DELETE /api/schemes -> Delete all schemes
 
 ## Running Locally
 - Install PostgreSQL  
-Windows: https://www.postgresql.org/download/windows/
+Windows: https://www.postgresql.org/download/windows/  
 Mac: https://www.postgresql.org/download/macosx/  
 - Create .env file in project directory with the following key-value pairs:  
 PORT=  
