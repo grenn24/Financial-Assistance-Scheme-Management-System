@@ -28,6 +28,7 @@ func Db() *gorm.DB {
 		log.Fatal("Error connecting to database: ", err.Error())
 	}
 	fmt.Println("Database connection successful!")
+	
 
 	// Create enum types
 	db.Exec(`

@@ -8,7 +8,9 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"start": "air",
+		"build-image": "docker build -t financial-assistance-schema-management-system:1.0.0 .",
+		"start-image": "docker run -p 3000:3000 financial-assistance-schema-management-system:1.0.0",
+		"dev": "air",
 		"build": "set GIN_MODE=release&&go build main.go"
 	}
 }

@@ -1,0 +1,6 @@
+PORT=3000
+DB_user=app
+DB_name=app
+DB_password=ilovepostgres
+DB_host=localhost
+DB_port=5432

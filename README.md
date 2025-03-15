@@ -63,21 +63,14 @@ DELETE /api/schemes -> Delete all schemes
 - Criteria (fkey)
 
 ## Running Locally
-- Install PostgreSQL  
-Windows: https://www.postgresql.org/download/windows/  
-Mac: https://www.postgresql.org/download/macosx/  
-- Create .env file in project directory with the following key-value pairs:  
-PORT=  
-DB_user =  
-DB_name =  
-DB_password =  
-DB_host =  
-DB_port =  
-- Run the following commands below
-```go
-go mod tidy
-npm start
+```bash
+// Install Docker
+// Rename .prod-env to .env
+mv .prod-env .env
+npm run build-image
+npm run start-image 
 ```
+
 
 ### Response JSON Structure (GET)
 ```json
