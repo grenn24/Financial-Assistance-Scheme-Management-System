@@ -42,8 +42,8 @@ type SchemeCriteria struct {
 }
 
 type HasChildren struct {
-	SchoolLevel string `json:"school_level,omitempty" validate:"required,oneof=primary secondary tertiary all"`
-	Number      int    `json:"number,omitempty" validate:"required"`
+	SchoolLevel string `json:"school_level,omitempty" validate:"omitempty,oneof=primary secondary tertiary all"`
+	Number      int    `json:"number,omitempty" validate:"omitempty"`
 }
 
 // Unmarshal JSONB (bytes) into HasChildren struct
