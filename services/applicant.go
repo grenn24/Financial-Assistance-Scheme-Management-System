@@ -41,19 +41,23 @@ func (applicantService *ApplicantService) CreateApplicant(applicant *models.Appl
 	result := tx.Create(&applicant)
 
 	if result.Error != nil {
+		tx.Rollback()
 		return nil, result.Error
 	}
 
 	for _, householdMember := range applicant.Household {
+
 		householdMember.HouseholdOwnerID = applicant.ID
 	}
 	if len(applicant.Household) > 0 {
+		tx.Rollback()
 		result = tx.Create(&applicant.Household)
 	} else {
 		applicant.Household = []models.HouseholdMember{}
 	}
 
 	if result.Error != nil {
+		tx.Rollback()
 		return nil, result.Error
 	}
 
@@ -64,9 +68,15 @@ func (applicantService *ApplicantService) CreateApplicant(applicant *models.Appl
 }
 
 func (applicantService *ApplicantService) UpdateApplicant(applicant *models.UpdateApplicantRequest, id string) (*models.Applicant, error) {
+	_, err := applicantService.GetApplicantByID(id)
+	if err != nil {
+		return nil, err
+	}
 	tx := applicantService.Db.Begin()
+	
 	result := tx.Model(&models.Applicant{}).Where("id = ?", id).Updates(&applicant)
 	if result.Error != nil {
+		tx.Rollback()
 		return nil, result.Error
 	}
 
@@ -74,14 +84,16 @@ func (applicantService *ApplicantService) UpdateApplicant(applicant *models.Upda
 		// Delete existing household members
 		result := applicantService.Db.Where("household_owner_id = ?", id).Delete(&models.HouseholdMember{})
 		if result.Error != nil {
+			tx.Rollback()
 			return nil, result.Error
 		}
 		for index, householdMember := range applicant.Household {
 			householdMember.HouseholdOwnerID = uuid.MustParse(id)
 			applicant.Household[index] = householdMember
 		}
-		result = tx.Create(&applicant.Household)
+		result = tx.Create(applicant.Household)
 		if result.Error != nil {
+			tx.Rollback()
 			return nil, result.Error
 		}
 

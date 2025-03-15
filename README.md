@@ -1,5 +1,9 @@
 # Financial Assistance Schema Management System
 
+Backend API that can perform CRUD operations on financial assistance schemes, applicants and applications
+Returns an list of schemes an applicant is eligible for applying
+Stores the state of the scheme application (pending, approved, rejected)
+
 **Creator:**  
 Hoo Di Heng
 
@@ -10,7 +14,7 @@ GoLang, Gin, GORM, validator, uuid
 
 **Applications**  
 GET /api/applications -> Get all applications  
-GET /api/application/{ID} -> Get application by id  
+GET /api/applications/{ID} -> Get application by id  
 POST /api/applications -> Create a new application  
 PUT /api/applications/{ID} -> Update application details  
 DELETE /api/applications/{ID} -> Delete an application by id  
@@ -18,7 +22,7 @@ DELETE /api/applications -> Delete all applications
 
 **Applicant**  
 GET /api/applicants -> Get all applicant  
-GET /api/applicant/{ID} -> Get applicant by id  
+GET /api/applicants/{ID} -> Get applicant by id  
 POST /api/applicants -> Create a new applicant  
 PUT /api/applicants/{ID} -> Update applicant details  
 DELETE /api/applicants/{ID} -> Delete an applicant by id  
@@ -27,10 +31,34 @@ DELETE /api/applicants -> Delete all applicants
 **Schemes**  
 GET /api/schemes -> Get all schemes  
 GET /api/schemes/{ID} -> Get scheme by id  
+GET /api/schemes/search?query={name} -> Search for schemes by name  
+GET /api/schemes/eligible?applicant={ID} -> Get eligible schemes for applicant  
 POST /api/schemes -> Create a new schemes  
 PUT /api/schemes/{ID} -> Update scheme details  
 DELETE /api/schemes/{ID} -> Delete a scheme by id  
 DELETE /api/schemes -> Delete all schemes
+
+**Database Schema**
+###Applicant / Household Member
+Name
+EmploymentStatus
+MaritalStatus
+Sex
+DOB
+Relation (household member only)
+SchoolLevel (household member only)
+HouseholdOwnerID (household member only)
+
+###Application
+SchemeID (fkey)
+ApplicantID (fkey)
+Status
+
+###Scheme
+Name
+Description
+Benefits (fkey)
+Criteria (fkey)
 
 **Response JSON Structure (GET)**
 ```json
@@ -41,7 +69,7 @@ DELETE /api/schemes -> Delete all schemes
 	"updated_at": "2025-03-14T22:50:28.513062+08:00",
 	"name": "Nathaniel",
 	"employment_status": false,
-	"marital_status": "single",
+	"marital_status": "married",
 	"sex": "male",
 	"date_of_birth": "2006-01-02T23:04:05+08:00",
 	"household": [
@@ -55,7 +83,8 @@ DELETE /api/schemes -> Delete all schemes
 			"marital_status": "single",
 			"sex": "female",
 			"date_of_birth": "2006-01-02T23:04:05+08:00",
-			"relation": "daughter"
+			"relation": "daughter",
+            "school_level":"primary"
 		}
 	]
 }
@@ -85,7 +114,6 @@ DELETE /api/schemes -> Delete all schemes
         "employment_status": true,
         "marital_status": "single",
         "has_children": {
-            "status": true,
             "school_level": "all"
         }
     }
@@ -105,7 +133,7 @@ DELETE /api/schemes -> Delete all schemes
         "updated_at": "2025-03-14T22:50:28.513062+08:00",
         "name": "Nathaniel",
         "employment_status": false,
-        "marital_status": "single",
+        "marital_status": "married",
         "sex": "male",
         "date_of_birth": "2006-01-02T23:04:05+08:00",
         "household": [
@@ -119,7 +147,8 @@ DELETE /api/schemes -> Delete all schemes
                 "marital_status": "single",
                 "sex": "male",
                 "date_of_birth": "2006-01-02T23:04:05+08:00",
-                "relation": "daughter"
+                "relation": "daughter",
+                "school_level":"primary"
             },
             {
                 "id": "01959522-9d23-7120-baf0-72f4a68734c1",
@@ -155,7 +184,6 @@ DELETE /api/schemes -> Delete all schemes
             "employment_status": true,
             "marital_status": "single",
             "has_children": {
-                "status": true,
                 "school_level": "all"
             }
         }
@@ -178,7 +206,16 @@ DELETE /api/schemes -> Delete all schemes
         "marital_status":"single",
         "sex":"female",
         "date_of_birth":"2006-01-02T15:04:05Z",
-        "relation":"daughter"
+        "relation":"daughter",
+        "school_level":"primary"
+    },
+    {
+        "name": "Isabelle",
+        "employment_status": false,
+        "marital_status":"single",
+        "sex":"female",
+        "date_of_birth":"2006-01-02T15:04:05Z",
+        "relation":"daughter",
     }]
 }
 
@@ -190,7 +227,6 @@ DELETE /api/schemes -> Delete all schemes
         "employment_status":true,
         "marital_status":"single",
         "has_children":{
-            "status":true,
             "school_level":"all"
         }
     },

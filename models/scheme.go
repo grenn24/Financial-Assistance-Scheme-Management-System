@@ -35,15 +35,14 @@ type SchemeCriteria struct {
 	SchemeID         uuid.UUID      `gorm:"not null" json:"-"` //one-to-one
 	EmploymentStatus *bool          `json:"employment_status,omitempty"`
 	MaritalStatus    *MaritalStatus `json:"marital_status,omitempty" validate:"omitempty,oneof=single married widowed divorced"`
-	HasChildren      *HasChildren   `gorm:"type:jsonb" json:"has_children,omitempty"`
+	HasChildren      *HasChildren   `gorm:"type:jsonb" json:"has_children,omitempty" validate:"omitempty"`
 
 	// Preloadable Columns
 	Scheme *Scheme `gorm:"foreignKey:SchemeID ; references:ID ; onDelete:CASCADE" json:"scheme,omitempty"`
 }
 
 type HasChildren struct {
-	Status      bool   `json:"status" validate:"required"`
-	SchoolLevel string `json:"school_level,omitempty" validate:"oneof=primary secondary tertiary all"`
+	SchoolLevel string `json:"school_level,omitempty" validate:"required,oneof=primary secondary tertiary all"`
 }
 
 // Unmarshal JSONB (bytes) into HasChildren struct
@@ -58,9 +57,6 @@ func (hasChildren *HasChildren) Scan(value interface{}) error {
 
 // Marshal HasChildren struct into JSONB (bytes)
 func (hasChildren HasChildren) Value() (driver.Value, error) {
-	if !hasChildren.Status {
-		return nil, nil
-	}
 	return json.Marshal(hasChildren)
 }
 

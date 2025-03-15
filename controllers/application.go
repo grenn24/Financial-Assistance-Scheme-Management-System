@@ -127,7 +127,7 @@ func (applicationController *ApplicationController) DeleteApplicationByID(contex
 		context.JSON(404, gin.H{"status": "VALIDATION_ERROR","message": "INVALID_ID_FORMAT"})
 		return
 	}
-	application, err := applicationController.ApplicationService.GetApplicationByID(id)
+	application, err := applicationController.ApplicationService.DeleteApplicationByID(id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			context.JSON(404, gin.H{"message": "Application not found"})

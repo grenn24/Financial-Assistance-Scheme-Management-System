@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	_ "fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -67,6 +68,7 @@ func (applicantController *ApplicantController) CreateApplicant(context *gin.Con
 			"message": err.Error()})
 		return
 	}
+
 
 	applicant, err := applicantController.ApplicantService.CreateApplicant(applicant)
 

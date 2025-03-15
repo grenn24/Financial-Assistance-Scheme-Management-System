@@ -45,6 +45,9 @@ func Db() *gorm.DB {
 			IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'status') THEN
 				CREATE TYPE status AS ENUM ('pending', 'approved', 'rejected');
 			END IF;
+			IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'school_level') THEN
+				CREATE TYPE school_level AS ENUM ('primary', 'secondary', 'tertiary');
+			END IF;
 		END $$;
 
 		CREATE EXTENSION IF NOT EXISTS pgcrypto;

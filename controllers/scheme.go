@@ -152,7 +152,7 @@ func (schemeController *SchemeController) DeleteSchemeByID(context *gin.Context)
 		context.JSON(404, gin.H{"message": "INVALID_ID_FORMAT"})
 		return
 	}
-	scheme, err := schemeController.SchemeService.GetSchemeByID(id)
+	scheme, err := schemeController.SchemeService.DeleteSchemeByID(id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			context.JSON(404, gin.H{"message": "Scheme not found"})
