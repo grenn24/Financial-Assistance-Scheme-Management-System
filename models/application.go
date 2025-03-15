@@ -39,3 +39,12 @@ type UpdateApplicationRequest struct {
 	Scheme    *Scheme    `gorm:"foreignKey:SchemeID ; references:ID ; constraint:OnDelete:CASCADE" json:"scheme"`
 }
 
+type CreateMultipleApplicationsRequest struct {
+	Base
+	ApplicantID uuid.UUID `gorm:"-" json:"applicant_id" validate:"required"`
+	SchemeID    []uuid.UUID `gorm:"-" json:"scheme_id" validate:"required"`
+	Status      Status    `gorm:"type:status ; not null" json:"status" validate:"required,oneof=pending approved rejected"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+

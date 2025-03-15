@@ -30,7 +30,7 @@ func (applicationController *ApplicationController) GetApplicationByID(context *
 	// Validate id
 	err := uuid.Validate(id)
 	if err != nil {
-		context.JSON(404, gin.H{"status": "VALIDATION_ERROR","message": "INVALID_ID_FORMAT"})
+		context.JSON(404, gin.H{"status": "VALIDATION_ERROR", "message": "INVALID_ID_FORMAT"})
 		return
 	}
 	application, err := applicationController.ApplicationService.GetApplicationByID(id)
@@ -43,6 +43,11 @@ func (applicationController *ApplicationController) GetApplicationByID(context *
 
 func (applicationController *ApplicationController) CreateApplication(context *gin.Context) {
 	application := new(models.Application)
+	hasMultiple := context.Query("multiple")
+	if (hasMultiple == "true") {
+		applicationController.CreateMultipleApplications(context)
+		return
+	}
 
 	// Bind http request body into struct
 	if err := context.ShouldBind(application); err != nil {
@@ -72,6 +77,48 @@ func (applicationController *ApplicationController) CreateApplication(context *g
 		return
 	}
 	context.JSON(200, application)
+}
+
+func (applicationController *ApplicationController) CreateMultipleApplications(context *gin.Context) {
+	applicationRequest := new(models.CreateMultipleApplicationsRequest)
+	applications := make([]*models.Application, 0)
+	// Bind http request body into struct
+	if err := context.ShouldBind(applicationRequest); err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"status": "INTERNAL_SERVER_ERROR",
+			"message": err.Error()})
+		return
+	}
+
+	// Validate http request body
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	if err := validate.Struct(applicationRequest); err != nil {
+		if _, ok := err.(validator.ValidationErrors); ok {
+			context.JSON(http.StatusBadRequest, gin.H{"status": "VALIDATION_ERROR",
+				"message": err.Error()})
+			return
+		}
+		context.JSON(http.StatusInternalServerError, gin.H{"status": "INTERNAL_SERVER_ERROR",
+			"message": err.Error()})
+		return
+	}
+
+	for _, schemeID := range applicationRequest.SchemeID {
+
+		application, err := applicationController.ApplicationService.CreateApplication(&models.Application{
+			ApplicantID: applicationRequest.ApplicantID,
+			SchemeID:    schemeID,
+			Status:      applicationRequest.Status,
+		})
+
+		if err != nil {
+			context.JSON(500, gin.H{"status": "INTERNAL_SERVER_ERROR",
+				"message": err.Error()})
+			return
+		}
+		applications = append(applications, application)
+	}
+
+	context.JSON(200, applications)
 
 }
 
@@ -79,8 +126,8 @@ func (applicationController *ApplicationController) UpdateApplication(context *g
 	id := context.Param("ID")
 	// Validate id
 
-	if err := uuid.Validate(id) ; err != nil {
-		context.JSON(404, gin.H{"status": "VALIDATION_ERROR","message": "INVALID_ID_FORMAT"})
+	if err := uuid.Validate(id); err != nil {
+		context.JSON(404, gin.H{"status": "VALIDATION_ERROR", "message": "INVALID_ID_FORMAT"})
 		return
 	}
 	application := new(models.UpdateApplicationRequest)
@@ -124,7 +171,7 @@ func (applicationController *ApplicationController) DeleteApplicationByID(contex
 	// Validate id
 	err := uuid.Validate(id)
 	if err != nil {
-		context.JSON(404, gin.H{"status": "VALIDATION_ERROR","message": "INVALID_ID_FORMAT"})
+		context.JSON(404, gin.H{"status": "VALIDATION_ERROR", "message": "INVALID_ID_FORMAT"})
 		return
 	}
 	application, err := applicationController.ApplicationService.DeleteApplicationByID(id)

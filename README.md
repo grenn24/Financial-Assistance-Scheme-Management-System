@@ -16,6 +16,7 @@ GoLang, Gin, GORM, validator, uuid
 GET /api/applications -> Get all applications  
 GET /api/applications/{ID} -> Get application by id  
 POST /api/applications -> Create a new application  
+POST /api/applications?multiple=true -> Create multiple new applications  
 PUT /api/applications/{ID} -> Update application details  
 DELETE /api/applications/{ID} -> Delete an application by id  
 DELETE /api/applications -> Delete all applications
@@ -59,6 +60,12 @@ DELETE /api/schemes -> Delete all schemes
 - Description
 - Benefits (fkey)
 - Criteria (fkey)
+
+## Running Locally
+```go
+    go mod tidy
+    go run main.go
+```
 
 ### Response JSON Structure (GET)
 ```json
