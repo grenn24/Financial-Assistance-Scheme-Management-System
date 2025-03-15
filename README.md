@@ -12,7 +12,7 @@ GoLang, PostgreSQL
 Gin, GORM, validator, uuid  
 
 ## API Endpoints
-https://documenter.getpostman.com/view/40285423/2sAYkBsLzE
+https://documenter.getpostman.com/view/40285423/2sAYkBsLzE  
 **Applications**  
 GET /api/applications -> Get all applications  
 GET /api/applications/{ID} -> Get application by id  
