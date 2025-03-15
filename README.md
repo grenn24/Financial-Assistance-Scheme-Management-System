@@ -8,7 +8,8 @@ Stores the state of the scheme application (pending, approved, rejected)
 Hoo Di Heng
 
 **Back-End:**  
-GoLang, Gin, GORM, validator, uuid
+GoLang, PostgreSQL  
+Gin, GORM, validator, uuid  
 
 ## API Endpoints
 
@@ -62,9 +63,17 @@ DELETE /api/schemes -> Delete all schemes
 - Criteria (fkey)
 
 ## Running Locally
+- Create .env file in project directory with the following key-value pairs:  
+PORT=  
+DB_user =  
+DB_name =  
+DB_password =  
+DB_host =  
+DB_port =  
+- Run the following commands below
 ```go
-    go mod tidy
-    go run main.go
+go mod tidy
+npm start
 ```
 
 ### Response JSON Structure (GET)

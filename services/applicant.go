@@ -50,7 +50,6 @@ func (applicantService *ApplicantService) CreateApplicant(applicant *models.Appl
 		householdMember.HouseholdOwnerID = applicant.ID
 	}
 	if len(applicant.Household) > 0 {
-		tx.Rollback()
 		result = tx.Create(&applicant.Household)
 	} else {
 		applicant.Household = []models.HouseholdMember{}
