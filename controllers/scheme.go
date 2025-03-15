@@ -65,6 +65,16 @@ func (schemeController *SchemeController) GetEligibleSchemes(context *gin.Contex
 	context.JSON(200, scheme)
 }
 
+func (schemeController *SchemeController) SearchSchemes(context *gin.Context) {
+	name := context.Query("query")
+	schemes, err := schemeController.SchemeService.SearchSchemes(name)
+	if err != nil {
+		context.JSON(500, gin.H{"message": err.Error(), "status": "INTERNAL_SERVER_ERROR"})
+		return
+	}
+	context.JSON(200, schemes)
+}
+
 func (schemeController *SchemeController) CreateScheme(context *gin.Context) {
 	scheme := new(models.Scheme)
 

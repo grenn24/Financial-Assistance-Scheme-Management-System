@@ -61,7 +61,7 @@ func (schemeService *SchemeService) GetEligibleSchemes(id string) ([]models.Sche
 				hasTertiary = true
 			}
 			// include schemes that allows all school levels
-			if (!hasChildrenInSchool) {
+			if !hasChildrenInSchool {
 				filter += fmt.Sprintf(" OR criteria.has_children->>'school_level' = '%s'", "all")
 				hasChildrenInSchool = true
 			}
@@ -79,6 +79,16 @@ func (schemeService *SchemeService) GetEligibleSchemes(id string) ([]models.Sche
 		Preload("Benefits").
 		Preload("Criteria").
 		Find(&schemes)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return schemes, nil
+}
+
+func (schemeService *SchemeService) SearchSchemes(query string) ([]models.Scheme, error) {
+	var schemes []models.Scheme
+	result := schemeService.Db.Preload("Benefits").Preload("Criteria").Where("name ILIKE ?", "%"+query+"%").Find(&schemes)
 
 	if result.Error != nil {
 		return nil, result.Error

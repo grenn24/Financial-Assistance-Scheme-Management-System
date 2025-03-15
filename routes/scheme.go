@@ -23,6 +23,10 @@ func SchemeRoutes(router *gin.RouterGroup, db *gorm.DB) {
 		schemeController.GetEligibleSchemes(context)
 	})
 
+	schemeRouter.GET("/search", func(context *gin.Context) {
+		schemeController.SearchSchemes(context)
+	})
+
 	schemeRouter.POST("/", func(context *gin.Context) {
 		schemeController.CreateScheme(context)
 	})

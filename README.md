@@ -10,7 +10,7 @@ Hoo Di Heng
 **Back-End:**  
 GoLang, Gin, GORM, validator, uuid
 
-### API Endpoints
+## API Endpoints
 
 **Applications**  
 GET /api/applications -> Get all applications  
@@ -38,7 +38,7 @@ PUT /api/schemes/{ID} -> Update scheme details
 DELETE /api/schemes/{ID} -> Delete a scheme by id  
 DELETE /api/schemes -> Delete all schemes
 
-### Database Schema
+## Database Schema
 **Applicant / Household Member**  
 - Name
 - EmploymentStatus
@@ -60,7 +60,7 @@ DELETE /api/schemes -> Delete all schemes
 - Benefits (fkey)
 - Criteria (fkey)
 
-**Response JSON Structure (GET)**
+### Response JSON Structure (GET)
 ```json
 // Applicant
 {
@@ -191,7 +191,7 @@ DELETE /api/schemes -> Delete all schemes
 }
 ```
 
-**Request JSON Structure (POST)**
+### Request JSON Structure (POST)
 ```json
 // Applicant
 {
