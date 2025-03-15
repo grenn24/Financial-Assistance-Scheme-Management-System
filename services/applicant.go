@@ -39,22 +39,6 @@ func (applicantService *ApplicantService) CreateApplicant(applicant *models.Appl
 	// Start Transaction
 	tx := applicantService.Db.Begin()
 	result := tx.Create(&applicant)
-
-	if result.Error != nil {
-		tx.Rollback()
-		return nil, result.Error
-	}
-
-	for _, householdMember := range applicant.Household {
-
-		householdMember.HouseholdOwnerID = applicant.ID
-	}
-	if len(applicant.Household) > 0 {
-		result = tx.Create(&applicant.Household)
-	} else {
-		applicant.Household = []models.HouseholdMember{}
-	}
-
 	if result.Error != nil {
 		tx.Rollback()
 		return nil, result.Error

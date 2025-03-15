@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/grenn24/financial-assistance-scheme-management-system/models"
@@ -88,7 +89,7 @@ func (schemeService *SchemeService) GetEligibleSchemes(id string) ([]models.Sche
 	result = schemeService.Db.Joins("JOIN scheme_criteria AS criteria ON criteria.scheme_id = schemes.id").
 		Where(
 			fmt.Sprintf("(criteria.employment_status IS NULL OR criteria.employment_status = ?) AND (criteria.marital_status IS NULL OR criteria.marital_status = ?) AND (criteria.has_children->>'school_level' IS NULL %s) AND (criteria.has_children->>'number' IS NULL OR criteria.has_children->>'number' = ?)", schoolLevelFilter),
-			applicant.EmploymentStatus, applicant.MaritalStatus, string(childrenCount),
+			applicant.EmploymentStatus, applicant.MaritalStatus, strconv.Itoa(childrenCount),
 		).
 		Preload("Benefits").
 		Preload("Criteria").
@@ -115,22 +116,6 @@ func (schemeService *SchemeService) CreateScheme(scheme *models.Scheme) (*models
 	tx := schemeService.Db.Begin()
 
 	result := tx.Create(&scheme)
-	if result.Error != nil {
-		tx.Rollback()
-		return nil, result.Error
-	}
-	scheme.Criteria.SchemeID = scheme.ID
-	result = tx.Create(&scheme.Criteria)
-	if result.Error != nil {
-		tx.Rollback()
-		return nil, result.Error
-	}
-
-	for _, benefit := range scheme.Benefits {
-		benefit.SchemeID = scheme.ID
-	}
-
-	result = tx.Create(&scheme.Benefits)
 	if result.Error != nil {
 		tx.Rollback()
 		return nil, result.Error
