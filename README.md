@@ -4,7 +4,7 @@ Backend API that can perform CRUD operations on financial assistance schemes, ap
 Returns an list of schemes an applicant is eligible for applying
 Stores the state of the scheme application (pending, approved, rejected)
 
-**Creator:**  
+**Creator**  
 Hoo Di Heng
 
 **Languages and Libraries**  
