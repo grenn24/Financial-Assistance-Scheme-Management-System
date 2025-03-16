@@ -10,7 +10,7 @@ Hoo Di Heng
 **Languages and Libraries**  
 GoLang, Gin, GORM, validator, uuid  
 **Data**  
-PostgreSQL
+PostgreSQL  
 **Deployment**  
 Docker
 
