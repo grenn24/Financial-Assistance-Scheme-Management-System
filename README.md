@@ -118,18 +118,12 @@ docker run -p 3000:3000 grenn24/financial-assistance-schema-management-system:1.
     "description": "Financial assistance for retrenched workers",
     "benefits": [
         {
-            "id": "01959558-a7bc-7626-9883-e001b0fae142",
-            "created_at": "2025-03-14T23:49:30.172403+08:00",
-            "updated_at": "2025-03-14T23:49:30.172403+08:00",
             "SchemeID": "01959558-a7bb-7574-92d5-7ae6f528671b",
             "name": "Additional SkillsFuture credits",
             "amount": 500.25
         }
     ],
     "criteria": {
-        "id": "01959558-a7bc-7e0e-b7ad-5e3e8057da81",
-        "created_at": "2025-03-14T23:49:30.17188+08:00",
-        "updated_at": "2025-03-14T23:49:30.17188+08:00",
         "SchemeID": "01959558-a7bb-7574-92d5-7ae6f528671b",
         "employment_status": true,
         "marital_status": "single",
