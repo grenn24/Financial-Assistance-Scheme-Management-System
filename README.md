@@ -7,9 +7,12 @@ Stores the state of the scheme application (pending, approved, rejected)
 **Creator:**  
 Hoo Di Heng
 
-**Back-End:**  
-GoLang, PostgreSQL  
-Gin, GORM, validator, uuid  
+**Languages and Libraries:**  
+GoLang, Gin, GORM, validator, uuid  
+**Data**
+PostgreSQL
+**Deployment**
+Docker
 
 ## API Endpoints
 https://documenter.getpostman.com/view/40285423/2sAYkBsLzE  
