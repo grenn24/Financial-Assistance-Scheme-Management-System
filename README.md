@@ -65,6 +65,17 @@ DELETE /api/schemes -> Delete all schemes
 - Benefits (fkey)
 - Criteria (fkey)
 
+**Scheme_Benefit**
+- SchemeID (fkey)
+- Name
+- Amount
+
+**Scheme_Criteria**
+- SchemeID (fkey)
+- EmploymentStatus
+- MaritalStatus
+- HasChildren
+
 ## Running Locally
 ```bash
 // Option 1 (build image manually)
