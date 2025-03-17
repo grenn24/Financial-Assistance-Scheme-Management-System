@@ -88,8 +88,7 @@ DELETE /api/schemes -> Delete all schemes
 ```bash
 // Option 1 (build image manually)
 // Install docker
-// Rename .prod-env to .env
-mv .prod-env .env
+mv .prod-env .env  //Rename .prod-env to .env
 npm run build-image
 npm run start-image
 
@@ -97,6 +96,8 @@ npm run start-image
 // Install docker
 npm run download-image
 docker run -p 3000:3000 grenn24/financial-assistance-schema-management-system:1.0.0
+
+docker stop <container-id>  //Stop container
 ```
 
 
