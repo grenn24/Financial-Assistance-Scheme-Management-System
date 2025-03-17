@@ -123,7 +123,7 @@ docker run -p 3000:3000 grenn24/financial-assistance-schema-management-system:1.
 			"sex": "female",
 			"date_of_birth": "2006-01-02T23:04:05+08:00",
 			"relation": "daughter",
-            "school_level":"primary"
+  "school_level":"primary"
 		}
 	]
 }
